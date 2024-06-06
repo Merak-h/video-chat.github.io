@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <style>
+        .media-container{
+            position: relative;
+            width: calc(100vw - 40px);
+            height: auto;
+            max-height: 90vh;
+            aspect-ratio: 16 / 9;
+        }
+        .video-box{
+            width: 100%;
+            height: 100%;
+        }
+        .video{
+            width: 100%;
+            height: 100%;
+            background-color: #000;
+        }
+
+        .media-controller-box{
+            width: 100%;
+            height: 60px;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            display: flex;
+            background-color: #252525ad;
+            opacity: 0;
+            transition: all .3s ease-in-out;
+            align-items: center;
+            column-gap: 24px;
+            padding-left: 24px;
+            box-sizing: border-box[];
+            justify-content: center;
+        }
+        .display-now, .media-controller-box:hover{
+            opacity: 1;
+        }
+        .is-reverse{
+            transform: scale(-1,1);
+        }
+        .button-box{
+            display: block;
+            width: 40px;
+            height: 40px;
+            border-radius: 100px;
+            position: relative;
+            background-color: #ff6161;
+        }
+        .button-box > div{
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 24px;
+            height: 24px;
+            transform: translate(-50%,-50%);
+        }
+        .button-box > div>svg{
+            fill: #fff;
+        }
+        .button-box > div:first-child{
+            display: block;
+        }
+        .button-box > div:last-child{
+            display: none;
+        }
+        .active{
+            background-color: #818181;
+        }
+        .active > div:first-child{
+            display: none;
+        }
+        .active > div:last-child{
+            display: block;
+        }
+
+        .overlay-mute-icon{
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: none;
+            z-index: 100;
+        }
+        .overlay-mute-icon svg{
+            fill: #ffffffc7;
+            filter: drop-shadow(0px 0px 8px #000);
+        }
+        .mued{
+            display: block;
+        }
+        .volume{
+            position: relative;
+            display: block;
+            width: 40px;
+            height: 80px;
+            margin-left: 60px;
+            transform: rotateZ(90deg);
+        }
+        .volume-point{
+            position: absolute;
+            left: 50%;
+            transform: translate(-50%,-50%);
+            background-color: #fff;
+            border-radius: 100px;
+            width: 12px;
+            height: 12px;
+            pointer-events: none;
+            z-index: 10;
+        }
+        .volume-bar{
+            position: absolute;
+            top: 0;
+            left: 50%;
+            width: 4px;
+            height: 100%;
+            transform: translateX(-50%);
+            pointer-events: none;
+            background: #fff;
+            z-index: 1;
+        }
+
+
+    </style>
+
+    <div class="media-container" id="mediaContainer">
+
+        <div class="video-box">
+            <div class="overlay-mute-icon" id="overlayMuteIcon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32px" height="32px" viewBox="0 0 24 24" fill="#000000" class="Hdh4hc cIGbvc"><path d="M0 0h24v24H0zm0 0h24v24H0z" fill="none"></path><path d="M19 11h-1.7c0 .74-.16 1.43-.43 2.05l1.23 1.23c.56-.98.9-2.09.9-3.28zm-4.02.17c0-.06.02-.11.02-.17V5c0-1.66-1.34-3-3-3S9 3.34 9 5v.18l5.98 5.99zM4.27 3L3 4.27l6.01 6.01V11c0 1.66 1.33 3 2.99 3 .22 0 .44-.03.65-.08l1.66 1.66c-.71.33-1.5.52-2.31.52-2.76 0-5.3-2.1-5.3-5.1H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c.91-.13 1.77-.45 2.54-.9L19.73 21 21 19.73 4.27 3z"></path></svg>
+            </div>
+            <video id="video" class="video"></video>
+            <p></p>
+        </div>
+        <div class="media-controller-box" id="mediaControllerBox">
+            <div class="button-box" id="reverse">
+                <div>
+                    <svg version="1.1" id="_x32_" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 512 512" style="width: 24px; height: 24px; opacity: 1;" xml:space="preserve">
+                        <g>
+                            <path class="st0" d="M263.906,89.042L159.729,193.225c0.532,6.51,1.712,12.848,3.481,18.927L282.839,92.516
+                                C276.753,90.754,270.423,89.581,263.906,89.042z" ></path>
+                            <path class="st0" d="M320.288,107.004L177.684,249.602c3.87,4.712,8.171,9.042,12.818,12.984l142.763-142.778
+                                C329.324,115.162,324.993,110.874,320.288,107.004z" ></path>
+                            <path class="st0" d="M255.992,0C153.658,0,70.687,82.963,70.687,185.313c0,78.41,49.304,143.936,117.485,172.515
+                                c18.603,7.784,33.004,21.696,24.458,42.658c-8.014,19.638-16.502,39.204-16.502,51.649c0,33.062,26.802,59.864,59.864,59.864
+                                s59.865-26.803,59.865-59.864c0-12.445-8.489-32.011-16.488-51.649c-8.56-20.962,5.842-34.875,24.444-42.658
+                                c68.18-28.579,117.499-94.105,117.499-172.515C441.313,82.963,358.343,0,255.992,0z M255.992,473.515
+                                c-9.193,0-16.645-7.46-16.645-16.66c0-9.193,7.452-16.646,16.645-16.646c9.208,0,16.66,7.453,16.66,16.646
+                                C272.653,466.055,265.2,473.515,255.992,473.515z M255.992,313.602c-70.856,0-128.289-57.432-128.289-128.289
+                                c0-70.856,57.433-128.29,128.289-128.29c70.857,0,128.29,57.433,128.29,128.29C384.282,256.17,326.85,313.602,255.992,313.602z" ></path>
+                                <polygon class="st0" points="21.782,0 0.011,21.792 490.218,512 511.989,490.219 	" ></polygon>
+                        </g>
+                    </svg>
+                </div>
+                <div>
+                    <svg version="1.1" id="_x32_" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 512 512" style="width: 24px; height: 24px; opacity: 1;" xml:space="preserve">
+                        <g>
+                            <path class="st0" d="M263.906,89.042L159.729,193.225c0.532,6.51,1.712,12.848,3.481,18.927L282.839,92.516
+                                C276.753,90.754,270.423,89.581,263.906,89.042z" ></path>
+                            <path class="st0" d="M320.288,107.004L177.684,249.602c3.87,4.712,8.171,9.042,12.818,12.984l142.763-142.778
+                                C329.324,115.162,324.993,110.874,320.288,107.004z" ></path>
+                            <path class="st0" d="M255.992,0C153.658,0,70.687,82.963,70.687,185.313c0,78.41,49.304,143.936,117.485,172.515
+                                c18.603,7.784,33.004,21.696,24.458,42.658c-8.014,19.638-16.502,39.204-16.502,51.649c0,33.062,26.802,59.864,59.864,59.864
+                                s59.865-26.803,59.865-59.864c0-12.445-8.489-32.011-16.488-51.649c-8.56-20.962,5.842-34.875,24.444-42.658
+                                c68.18-28.579,117.499-94.105,117.499-172.515C441.313,82.963,358.343,0,255.992,0z M255.992,473.515
+                                c-9.193,0-16.645-7.46-16.645-16.66c0-9.193,7.452-16.646,16.645-16.646c9.208,0,16.66,7.453,16.66,16.646
+                                C272.653,466.055,265.2,473.515,255.992,473.515z M255.992,313.602c-70.856,0-128.289-57.432-128.289-128.289
+                                c0-70.856,57.433-128.29,128.289-128.29c70.857,0,128.29,57.433,128.29,128.29C384.282,256.17,326.85,313.602,255.992,313.602z" ></path>
+                                <!-- <polygon class="st0" points="21.782,0 0.011,21.792 490.218,512 511.989,490.219 	" ></polygon> -->
+                        </g>
+                    </svg>
+                </div>
+            </div>
+            <div class="button-box active" id="mute">
+                <div>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" viewBox="0 0 24 24" fill="#000000" class="Hdh4hc cIGbvc"><path d="M0 0h24v24H0zm0 0h24v24H0z" fill="none"></path><path d="M19 11h-1.7c0 .74-.16 1.43-.43 2.05l1.23 1.23c.56-.98.9-2.09.9-3.28zm-4.02.17c0-.06.02-.11.02-.17V5c0-1.66-1.34-3-3-3S9 3.34 9 5v.18l5.98 5.99zM4.27 3L3 4.27l6.01 6.01V11c0 1.66 1.33 3 2.99 3 .22 0 .44-.03.65-.08l1.66 1.66c-.71.33-1.5.52-2.31.52-2.76 0-5.3-2.1-5.3-5.1H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c.91-.13 1.77-.45 2.54-.9L19.73 21 21 19.73 4.27 3z"></path></svg>
+                </div>
+                <div>
+                    <svg focusable="false" width="24" height="24" viewBox="0 0 24 24" class="Hdh4hc cIGbvc NMm5M"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"></path><path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"></path></svg>
+                </div>
+            </div>
+            <div class="button-box active" id="camera">
+                <div>
+                    <svg focusable="false" width="24" height="24" viewBox="0 0 24 24" class="Hdh4hc cIGbvc NMm5M"><path d="M18 10.48V6c0-1.1-.9-2-2-2H6.83l2 2H16v7.17l2 2v-1.65l4 3.98v-11l-4 3.98zM16 16L6 6 4 4 2.81 2.81 1.39 4.22l.85.85C2.09 5.35 2 5.66 2 6v12c0 1.1.9 2 2 2h12c.34 0 .65-.09.93-.24l2.85 2.85 1.41-1.41L18 18l-2-2zM4 18V6.83L15.17 18H4z"></path></svg>
+                </div>
+                <div>
+                    <svg focusable="false" width="24" height="24" viewBox="0 0 24 24" class="Hdh4hc cIGbvc NMm5M"><path d="M18 10.48V6c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-4.48l4 3.98v-11l-4 3.98zm-2-.79V18H4V6h12v3.69z"></path></svg>
+                </div>
+            </div>
+
+
+            <div class="volume" id="volume">
+                <div class="volume-point"></div>
+                <div class="volume-bar"></div>
+            </div>
+            <!-- <div class="button-box" id="reverse">
+                <span class="button-text">反転</span>
+                <div class="button"></div>
+            </div>
+            <div class="button-box active" id="camera">
+                <span class="button-text">カメラ</span>
+                <div class="button"></div>
+            </div> -->
+        </div>
+    </div>
+
+    <script>
+        window.addEventListener("DOMContentLoaded",()=>{
+            camera();
+            toggleFlipHorizontally();
+            displayController()
+        });
+
+        // 反転の切り替え
+        function toggleFlipHorizontally(){
+            const reverse = document.getElementById("reverse");
+            const video = document.getElementById('video');
+            reverse.addEventListener('click',()=>{
+                if(reverse.classList.contains("active")){
+                    reverse.classList.remove("active");
+                    video.classList.remove("is-reverse");
+                    
+                }else{
+                    reverse.classList.add("active");
+                    video.classList.add("is-reverse");
+                }
+            });
+        }
+
+
+
+    // カメラ情報の取得と描画
+    function camera(){
+        const video = document.getElementById('video');
+        const cameraOn = document.getElementById("camera");
+        const mute = document.getElementById('mute'); 
+        navigator.mediaDevices.getUserMedia({
+            video: true,
+            audio: true,
+        }).then(stream =>{
+            video.srcObject = stream;
+            video.play();
+
+            enableCamera(stream,cameraOn);
+            enableMute(video,mute);
+        }).catch(e=>{
+            console.log(e);
+        })
+    }
+
+    // カメラのオンオフ切り替え
+    function enableCamera(stream,trigger){
+        trigger.addEventListener('click',()=>{
+            
+            const videoTrack = stream.getVideoTracks()[0];
+            
+            videoTrack.enabled = !videoTrack.enabled;
+            if(!videoTrack.enabled){
+                trigger.classList.remove("active");
+                
+            }else{
+                trigger.classList.add("active");
+            }
+        })
+    }
+
+    function enableMute(target,trigger){
+        const overlayMuteIcon = document.getElementById("overlayMuteIcon");
+        trigger.addEventListener('click',()=>{
+            if(target.muted){
+                target.muted = false;
+                trigger.classList.add("active");
+                overlayMuteIcon.classList.remove("mued");
+            }else{
+                target.muted = true;
+                trigger.classList.remove("active");
+                overlayMuteIcon.classList.add("mued");
+            }
+        })
+    }
+
+    // マウスが動いたときにコントローラーパネルを表示
+    function displayController(){
+        const target = document.getElementById('mediaContainer');
+        const elm = document.getElementById('mediaControllerBox');
+
+        let onMouse = false;
+        let timer;
+        target.addEventListener('mouseover',()=>{
+            onMouse = true;
+
+        })
+        target.addEventListener('mouseout',()=>{
+            onMouse = false;
+            clearTimeout(timer);
+            elm.classList.remove('display-now');
+        })
+        target.addEventListener('mousemove',()=>{
+            if(onMouse){
+                elm.classList.add('display-now');
+                clearTimeout(timer);
+                timer = setTimeout(() => {
+                        elm.classList.remove('display-now');
+                    }, 4000);
+            }
+        })
+    }
+
+    const video = document.getElementById('video');
+    const volume = document.getElementById('volume');
+    adjustVolume(video,volume);
+    function adjustVolume(target,controller){
+        let isDown = false;
+        const changeVolume = (e)=>{
+            const height = volume.offsetHeight;
+            let volumeValue = Math.round((height-e.offsetY)/height*100)/100;
+            volumeValue = volumeValue < 0.03 ? 0 : volumeValue
+            video.volume = volumeValue;
+
+            controller.children[0].style.top=e.offsetY + "px";
+            controller.children[1].style.background = `linear-gradient(#0000, #0000 ${100 - volumeValue * 100}%, #fff ${100 - volumeValue * 100}%, #fff)`;
+
+        }
+        controller.addEventListener('mousedown',()=>{
+            isDown = true;
+        });
+        controller.addEventListener('mouseup',()=>{
+            isDown = false;
+        });
+        controller.addEventListener('mousemove',(e)=>{
+            if(isDown){
+                changeVolume(e);
+            }
+        });
+        controller.addEventListener('click',(e)=>{
+            changeVolume(e);
+        });
+    }
+    
+
+        
+    </script>
+</body>
+</html>
